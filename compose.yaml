@@ -3,7 +3,7 @@ services:
     build: .
     ports:
       - "8000:8000"
-    environment: 
+    environment:
       - DATABASE_URL=postgresql://postgres:fahim%4017315@db:5432/postgres
     env_file:
       - .env
