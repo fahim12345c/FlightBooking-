@@ -10,3 +10,8 @@ class UserCreate(BaseModel):
 class UserRead(BaseModel):
     id: uuid.UUID
     email: EmailStr
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"

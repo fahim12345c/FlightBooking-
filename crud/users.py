@@ -9,19 +9,23 @@ This module provides all database operations for users:
 - List active/inactive users
 """
 
+from uuid import UUID
+
 from sqlmodel import select, Session
 from schemas.users import UserCreate
 from models.users import UserInDB
-from utils.security import hash_password
+from utils.security import hash_password, verify_password
 
 
 def get_user_by_email(db: Session, email: str):
     return db.exec(select(UserInDB).where(UserInDB.email == email)).first()
 
 
+def get_user_by_id(db: Session, user_id: str | UUID):
+    return db.get(UserInDB, user_id)
+
+
 def create_user(db: Session, user: UserCreate):
-    print("Password:", repr(user.password))
-    print("Length:", len(user.password))
     hashed_password = hash_password(user.password)
 
     # Create new user instance
@@ -35,6 +39,17 @@ def create_user(db: Session, user: UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def authenticate_user(db: Session, email: str, password: str):
+    user = get_user_by_email(db, email)
+    if not user:
+        return None
+
+    if not verify_password(password, user.password):
+        return None
+
+    return user
 
 
 # def verify_password_for_user(password: str, password_hash: str) -> bool:
